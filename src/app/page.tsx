@@ -3,6 +3,7 @@ import { AttackForm } from "@/components/attack-input";
 import { ResponseType } from "../components/constants";
 import { useState } from "react";
 import { ImagePreview } from "@/components/image-preview";
+import { PreviewData } from "@/components/data-preview";
 
 const Page = () => {
   const [data, setData] = useState<ResponseType | null>(null);
@@ -14,7 +15,9 @@ const Page = () => {
         setSelectedImage={setSelectedImage}
         selectedImage={selectedImage}
       />
-      {selectedImage ? <ImagePreview selectedImage={selectedImage} /> : null}
+      {data && selectedImage ? (
+        <PreviewData selectedImage={selectedImage} data={data} />
+      ) : null}
     </div>
   );
 };

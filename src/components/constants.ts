@@ -1,6 +1,7 @@
 export type ResponseType = {
-  cleanPrediction: number;
-  adversarialPrediction: number;
-  Base64adversarialimage: string;
-  attackSuccessStatus: string;
+  clean_prediction: number;
+  adversarial_prediction: number;
+  epsilon: number;
+  adversarial_image_b64: string;
+  attack_success: string;
 };

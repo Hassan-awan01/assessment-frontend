@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Dispatch, SetStateAction, useState } from "react";
 import { ACCEPTED_IMAGE_MIME_TYPES, formSchema, MAX_FILE_SIZE } from "./schema";
 import { ResponseType } from "./constants";
+import axios from "axios";
 
 const DEFAULT_EPSILON = 0.5;
 const MIN_EPSILON = 0.0;
@@ -41,32 +42,47 @@ export const AttackForm = ({
     },
   });
 
-  const onSubmit = async (values: FormData) => {
-    if (!selectedImage) return;
+  const onSubmit = async (values: { image: FileList; epsilon: number }) => {
+    if (!values?.image?.[0]) return;
 
     setIsProcessing(true);
 
     try {
-      console.log("Preparing model inference payload:", values);
-
       const imageFile = values.image[0];
 
       const formData = new FormData();
-      formData.append("image", imageFile);
-      formData.append("epsilon", values.epsilon.toString());
-      // Production ML inference call
-      // const response = await fetch("/api/v1/inference", {
-      //   method: "POST",
-      //   body: formData,
-      //   headers: {
-      //     "X-Model-Type": "computer-vision",
-      //     "X-Client-Version": "1.0.0"
-      //   }
-      // });
+      formData.append("file", imageFile);
+      formData.append("epsilon", String(values.epsilon));
 
-      console.log("Model inference request prepared successfully");
-    } catch (error) {
-      console.error("Model inference preparation failed:", error);
+      const response = await axios.post(
+        "http://localhost:8000/attack",
+        formData,
+        {
+          headers: {
+            "X-Model-Type": "computer-vision",
+            "X-Client-Version": "1.0.0",
+          },
+          onUploadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              const pct = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+              console.log(`Upload progress: ${pct}%`);
+            }
+          },
+          timeout: 120_000,
+        }
+      );
+
+      const data = response.data;
+      console.log("Attack response:", data);
+      setData(data);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        console.error("Axios error:", err.response?.data ?? err.message);
+      } else {
+        console.error("Unexpected error:", err);
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -165,7 +181,7 @@ export const AttackForm = ({
             disabled={isProcessing || !selectedImage}
             className="w-full"
           >
-            {isProcessing ? "Processing..." : "Run Model Inference"}
+            {isProcessing ? "Processing..." : "Run FGSM Attack"}
           </Button>
         </form>
       </Form>
