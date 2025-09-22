@@ -55,7 +55,7 @@ export const AttackForm = ({
       formData.append("epsilon", String(values.epsilon));
 
       const response = await axios.post(
-        "http://localhost:8000/attack",
+        "http://3.26.192.60:8000/attack",
         formData,
         {
           headers: {
