@@ -54,7 +54,7 @@ export const AttackForm = ({
       formData.append("file", imageFile);
       formData.append("epsilon", String(values.epsilon));
       const url = process.env.NEXT_PUBLIC_API_URL!;
-      const response = await axios.post(url, formData, {
+      const response = await axios.post("api/attack", formData, {
         headers: {
           "X-Model-Type": "computer-vision",
           "X-Client-Version": "1.0.0",
