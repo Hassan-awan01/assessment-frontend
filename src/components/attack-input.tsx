@@ -53,26 +53,22 @@ export const AttackForm = ({
       const formData = new FormData();
       formData.append("file", imageFile);
       formData.append("epsilon", String(values.epsilon));
-
-      const response = await axios.post(
-        "http://3.26.192.60:8000/attack",
-        formData,
-        {
-          headers: {
-            "X-Model-Type": "computer-vision",
-            "X-Client-Version": "1.0.0",
-          },
-          onUploadProgress: (progressEvent) => {
-            if (progressEvent.total) {
-              const pct = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
-              );
-              console.log(`Upload progress: ${pct}%`);
-            }
-          },
-          timeout: 120_000,
-        }
-      );
+      const url = process.env.NEXT_PUBLIC_API_URL!;
+      const response = await axios.post(url, formData, {
+        headers: {
+          "X-Model-Type": "computer-vision",
+          "X-Client-Version": "1.0.0",
+        },
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const pct = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            console.log(`Upload progress: ${pct}%`);
+          }
+        },
+        timeout: 120_000,
+      });
 
       const data = response.data;
       console.log("Attack response:", data);
